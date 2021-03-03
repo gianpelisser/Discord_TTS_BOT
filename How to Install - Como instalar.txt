@@ -1,0 +1,23 @@
+0 - PYTHON VERSION => 3.8
+=================================
+1 - ISTALL PIP AND REQUIREMENTS
+
+Install requirements by cmd
+pip install -r requirements.txt
+
+---------------------------------
+=================================
+---------------------------------
+# pip install gTTS
+# pip install -U discord.py[voice]
+# pip install -r requirements.txt
+---------------------------------
+=================================
+---------------------------------
+2 - TOKEN
+Don't forget to change the BOT TOKEN in the file:
+token.txt
+---------------------------------
+=================================
+---------------------------------
+4 - Good Luck - Boa sorte!
