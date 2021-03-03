@@ -35,8 +35,10 @@ class Comandos(commands.Cog):
         else:
             return
         # """
+
         """ # Adicione ou remova (jogo da velha #) para desabilitar essa linha (comentar).
         # Bloquear outras pessoas de usar o BOT, permitindo apenas você
+        # Subistitua o numero 11111 pelo seu discord id. E somente você vai usar o BOT
         if member.id != 11111:
             return
         # """
@@ -89,6 +91,13 @@ class Comandos(commands.Cog):
         Entra na mesma sala de VOZ, e fala o que você escreveu.
         Portugues
         """
+        member = ctx.author
+        """ # Adicione ou remova (jogo da velha #) para desabilitar essa linha (comentar).
+        # Bloquear outras pessoas de usar o BOT, permitindo apenas você
+        # Subistitua o numero 11111 pelo seu discord id. E somente você vai usar o BOT
+        if member.id != 11111:
+            return
+        # """
         if palavra is None:
             return await ctx.send("ttspt + alguma coisa")
         if discord.utils.find(lambda r: r.name == "ADM Black Holita" or r.name == "TTS [BOT]", ctx.author.roles):
@@ -144,6 +153,13 @@ class Comandos(commands.Cog):
         Remover o BOT da CALL
         ttssair | ttss
         """
+        member = ctx.author
+        """ # Adicione ou remova (jogo da velha #) para desabilitar essa linha (comentar).
+        # Bloquear outras pessoas de usar o BOT, permitindo apenas você
+        # Subistitua o numero 11111 pelo seu discord id. E somente você vai usar o BOT
+        if member.id != 11111:
+            return
+        # """
         try:
             await ctx.voice_client.disconnect()
         except:
@@ -158,6 +174,13 @@ class Comandos(commands.Cog):
         Entra na mesma sala de VOZ, e fala o que você escreveu.
         English
         """
+        member = ctx.author
+        """ # Adicione ou remova (jogo da velha #) para desabilitar essa linha (comentar).
+        # Bloquear outras pessoas de usar o BOT, permitindo apenas você
+        # Subistitua o numero 11111 pelo seu discord id. E somente você vai usar o BOT
+        if member.id != 11111:
+            return
+        # """
         if palavra is None:
             return await ctx.send(".en + alguma coisa")
         if discord.utils.find(lambda r: r.name == "ADM Black Holita" or r.name == "TTS [BOT]", ctx.author.roles):
@@ -212,6 +235,13 @@ class Comandos(commands.Cog):
         Entra na mesma sala de VOZ, e fala o que você escreveu.
         Spanish
         """
+        member = ctx.author
+        """ # Adicione ou remova (jogo da velha #) para desabilitar essa linha (comentar).
+        # Bloquear outras pessoas de usar o BOT, permitindo apenas você
+        # Subistitua o numero 11111 pelo seu discord id. E somente você vai usar o BOT
+        if member.id != 11111:
+            return
+        # """
         if palavra is None:
             return await ctx.send(".es + alguma coisa")
         if discord.utils.find(lambda r: r.name == "ADM Black Holita" or r.name == "TTS [BOT]", ctx.author.roles):
