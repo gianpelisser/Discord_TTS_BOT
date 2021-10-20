@@ -4,4 +4,4 @@
 
 > Código: Python 3.8
 
-> Mini Tutorial de como instalar: (VIDEO LINK)
+> Mini Tutorial de como instalar: https://youtu.be/3EXod46kolk
