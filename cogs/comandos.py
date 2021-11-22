@@ -2,13 +2,27 @@ import discord
 import discord.role
 from discord.ext import commands
 import asyncio
+import time
+import random
 from gtts import gTTS
 # pip install gTTS
-# pip install -U discord.py[voice]
-# pip install -r requirements.txt
 """
-Informações sobre a Biblioteca gTTS
-https://pypi.org/project/gTTS/
+from pygame import mixer
+import os
+import json
+import pymysql
+import pymysql.cursors
+import ffmpeg
+from youtube_dl import YoutubeDL
+from discord.ext.commands import Bot
+from discord.voice_client import VoiceClient
+# pip install --upgrade discord-components
+from discord_components import (
+    Button,
+    ButtonStyle,
+    Select,
+    SelectOption
+)
 """
 
 
@@ -18,99 +32,16 @@ class Comandos(commands.Cog):
 
     @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.channel)
     @commands.guild_only()
-    @commands.command(name='falar', aliases=['fale', 'f'])
-    async def tts(self, ctx, *, frase=None, channel: discord.VoiceChannel = None):
-        """
-        Entra na mesma sala de VOZ, e fala o que você escreveu.
-        Portugues
-        """
-        if frase is None:
-            return await ctx.send("ttsfale + alguma coisa")
-        member = ctx.author
-        """ # Adicione ou remova (jogo da velha #) para desabilitar essa linha (comentar).
-        # Permite usar o comando, somente quem tiver o cargo informado abaixo pelo nome (name).
-        if discord.utils.find(lambda r: r.name == "Nome de um Cargo do Discord" or r.name == "Nome de um Cargo do Discord", ctx.author.roles):
-            # await ctx.message.delete()
-            await ctx.send(f"Lendo sua mensagem...")
-        else:
-            return
-        # """
-
-        """ # Adicione ou remova (jogo da velha #) para desabilitar essa linha (comentar).
-        # Bloquear outras pessoas de usar o BOT, permitindo apenas você
-        # Subistitua o numero 11111 pelo seu discord id. E somente você vai usar o BOT
-        if member.id != 11111:
-            return
-        # """
-        # define um arquivo inicial para ser usado
-        file = "file.mp3"
-
-        # iniciar o TTS tts, Criar MP3 e tocar
-        nome_user = str(member.name).lower()
-
-        try:
-            # Em LANG='IDIOMA' entre as aspas simples você vai colocar o Idioma que você quer.
-            # Consulte a Biblioteca gTTS para ver quais são as sigles correspondentes para cada idioma.
-            tts = gTTS(text=f'{nome_user} disse, {frase}', lang='pt')
-            tts.save(file)
-
-        except Exception as e:
-            return await ctx.send(e)
-        # Daqui indiante é fazer o BOT "tentar" entrar na mesma sala de voz que você (quem usou o comando).
-        try:
-            if not channel:
-                try:
-                    channel = ctx.author.voice.channel
-                except AttributeError:
-                    pass
-            vc = ctx.voice_client
-            if vc:
-                if vc.channel.id == channel.id:
-                    return
-                try:
-                    await vc.move_to(channel)
-                except asyncio.TimeoutError:
-                    pass
-            else:
-                try:
-                    await channel.connect()
-                except asyncio.TimeoutError:
-                    pass
-            # tocar som
-            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(file))
-            return ctx.voice_client.play(source)
-        except Exception as e:
-            return await ctx.send(e)
-    # fim
-
-    @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.channel)
-    @commands.guild_only()
-    @commands.command(name='brazil', aliases=['pt', 'br'])
-    async def ttspt(self, ctx, *, palavra=None, channel: discord.VoiceChannel = None):
-        """
-        Entra na mesma sala de VOZ, e fala o que você escreveu.
-        Portugues
-        """
-        member = ctx.author
-        """ # Adicione ou remova (jogo da velha #) para desabilitar essa linha (comentar).
-        # Bloquear outras pessoas de usar o BOT, permitindo apenas você
-        # Subistitua o numero 11111 pelo seu discord id. E somente você vai usar o BOT
-        if member.id != 11111:
-            return
-        # """
+    @commands.command(name='portugues', aliases=['fale', 'falar', 'f', 'tts', 'pt', 'br', 'brasil', 'brazil'])
+    async def tts_pt_br(self, ctx, *, palavra=None, channel: discord.VoiceChannel = None):
+        guild = ctx.guild
         if palavra is None:
-            return await ctx.send("ttspt + alguma coisa")
-        if discord.utils.find(lambda r: r.name == "ADM Black Holita" or r.name == "TTS [BOT]", ctx.author.roles):
-            # await ctx.message.delete()
-            await ctx.send(f"Lendo sua mensagem...")
-        else:
-            return
+            return await ctx.send("gpt + alguma coisa")
+        await ctx.send(f"Lendo sua mensagem, aguarde.")
 
-        # define variables
+        random_file_id = random.randint(1, 1000)
+        file = f"file-{random_file_id}.mp3"
 
-        file = "file.mp3"
-
-        # initialize tts, create mp3 and play
         try:
             tts = gTTS(text=f'{palavra}', lang='pt')
             tts.save(file)
@@ -138,28 +69,30 @@ class Comandos(commands.Cog):
                 except asyncio.TimeoutError:
                     pass
             # tocar som
-            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(file))
-            return ctx.voice_client.play(source)
+
+            voice_client: discord.VoiceClient = discord.utils.get(self.bot.voice_clients, guild=guild)
+            audio_source = discord.FFmpegPCMAudio(file)
+            if not voice_client.is_playing():
+                voice_client.play(audio_source, after=None)
+            while voice_client.is_playing():
+                time.sleep(1)
+
+            try:
+                return await ctx.voice_client.disconnect()
+            except:
+                return
+
         except Exception as e:
             return await ctx.send(e)
-
     # fim
 
     @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.channel)
     @commands.guild_only()
-    @commands.command(name='sair', aliases=['exit', 'leave', 's'])
-    async def leave(self, ctx):
+    @commands.command(name='exit', aliases=['sair', 's', 'leave'])
+    async def leave_cmd(self, ctx):
         """
-        Remover o BOT da CALL
-        ttssair | ttss
+        Remove BOT from the Call (Sala de Voz).
         """
-        member = ctx.author
-        """ # Adicione ou remova (jogo da velha #) para desabilitar essa linha (comentar).
-        # Bloquear outras pessoas de usar o BOT, permitindo apenas você
-        # Subistitua o numero 11111 pelo seu discord id. E somente você vai usar o BOT
-        if member.id != 11111:
-            return
-        # """
         try:
             await ctx.voice_client.disconnect()
         except:
@@ -168,32 +101,17 @@ class Comandos(commands.Cog):
 
     @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.channel)
     @commands.guild_only()
-    @commands.command(name='falaren', aliases=['faleen', 'fen', 'en'])
-    async def ttsen(self, ctx, *, palavra=None, channel: discord.VoiceChannel = None):
-        """
-        Entra na mesma sala de VOZ, e fala o que você escreveu.
-        English
-        """
-        member = ctx.author
-        """ # Adicione ou remova (jogo da velha #) para desabilitar essa linha (comentar).
-        # Bloquear outras pessoas de usar o BOT, permitindo apenas você
-        # Subistitua o numero 11111 pelo seu discord id. E somente você vai usar o BOT
-        if member.id != 11111:
-            return
-        # """
+    @commands.command(name='english', aliases=['en', 'eng', 'ingles'])
+    async def tts_eng(self, ctx, *, palavra=None, channel: discord.VoiceChannel = None):
+        guild = ctx.guild
         if palavra is None:
-            return await ctx.send(".en + alguma coisa")
-        if discord.utils.find(lambda r: r.name == "ADM Black Holita" or r.name == "TTS [BOT]", ctx.author.roles):
-            # await ctx.message.delete()
-            await ctx.send(f"Lendo sua mensagem...")
-        else:
-            return
+            return await ctx.send("gen + text")
 
-        # define variables
+        await ctx.send(f"Reading your message, wait...")
 
-        file = "file.mp3"
+        random_file_id = random.randint(1, 1000)
+        file = f"file-{random_file_id}.mp3"
 
-        # initialize tts, create mp3 and play
         try:
             tts = gTTS(text=f'{palavra}', lang='en')
             tts.save(file)
@@ -221,38 +139,34 @@ class Comandos(commands.Cog):
                 except asyncio.TimeoutError:
                     pass
             # tocar som
-            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(file))
-            return ctx.voice_client.play(source)
+
+            voice_client: discord.VoiceClient = discord.utils.get(self.bot.voice_clients, guild=guild)
+            audio_source = discord.FFmpegPCMAudio(file)
+            if not voice_client.is_playing():
+                voice_client.play(audio_source, after=None)
+            while voice_client.is_playing():
+                time.sleep(1)
+
+            try:
+                return await ctx.voice_client.disconnect()
+            except:
+                return
+
         except Exception as e:
             return await ctx.send(e)
     # fim
 
     @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.channel)
     @commands.guild_only()
-    @commands.command(name='falares', aliases=['falees', 'fes', 'es'])
-    async def ttses(self, ctx, *, palavra=None, channel: discord.VoiceChannel = None):
-        """
-        Entra na mesma sala de VOZ, e fala o que você escreveu.
-        Spanish
-        """
-        member = ctx.author
-        """ # Adicione ou remova (jogo da velha #) para desabilitar essa linha (comentar).
-        # Bloquear outras pessoas de usar o BOT, permitindo apenas você
-        # Subistitua o numero 11111 pelo seu discord id. E somente você vai usar o BOT
-        if member.id != 11111:
-            return
-        # """
+    @commands.command(name='espanhol', aliases=['esp', 'es'])
+    async def tts_esp(self, ctx, *, palavra=None, channel: discord.VoiceChannel = None):
+        guild = ctx.guild
         if palavra is None:
-            return await ctx.send(".es + alguma coisa")
-        if discord.utils.find(lambda r: r.name == "ADM Black Holita" or r.name == "TTS [BOT]", ctx.author.roles):
-            # await ctx.message.delete()
-            await ctx.send(f"Lendo sua mensagem...")
-        else:
-            return
+            return await ctx.send("ges + text")
+        await ctx.send(f"Leyendo tu mensaje, espera...")
 
-        # define variables
-
-        file = "file.mp3"
+        random_file_id = random.randint(1, 1000)
+        file = f"file-{random_file_id}.mp3"
 
         # initialize tts, create mp3 and play
         try:
@@ -282,31 +196,35 @@ class Comandos(commands.Cog):
                 except asyncio.TimeoutError:
                     pass
             # tocar som
-            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(file))
-            return ctx.voice_client.play(source)
+
+            voice_client: discord.VoiceClient = discord.utils.get(self.bot.voice_clients, guild=guild)
+            audio_source = discord.FFmpegPCMAudio(file)
+            if not voice_client.is_playing():
+                voice_client.play(audio_source, after=None)
+            while voice_client.is_playing():
+                time.sleep(1)
+
+            try:
+                return await ctx.voice_client.disconnect()
+            except:
+                return
+
         except Exception as e:
             return await ctx.send(e)
+
     # fim
 
     @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.channel)
     @commands.guild_only()
-    @commands.command(name='falarjp', aliases=['falejp', 'fjp', 'jp'])
+    @commands.command(name='japanese', aliases=['ja', 'jp'])
     async def ttsjp(self, ctx, *, palavra=None, channel: discord.VoiceChannel = None):
-        """
-        Entra na mesma sala de VOZ, e fala o que você escreveu.
-        Japones
-        """
+        guild = ctx.guild
         if palavra is None:
-            return await ctx.send(".jp + alguma coisa")
-        if discord.utils.find(lambda r: r.name == "ADM Black Holita" or r.name == "TTS [BOT]", ctx.author.roles):
-            # await ctx.message.delete()
-            await ctx.send(f"Lendo sua mensagem...")
-        else:
-            return
+            return await ctx.send("gjp + text")
+        await ctx.send(f"待ってください。")
 
-        # define variables
-
-        file = "file.mp3"
+        random_file_id = random.randint(1, 1000)
+        file = f"file-{random_file_id}.mp3"
 
         # initialize tts, create mp3 and play
         try:
@@ -336,34 +254,39 @@ class Comandos(commands.Cog):
                 except asyncio.TimeoutError:
                     pass
             # tocar som
-            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(file))
-            return ctx.voice_client.play(source)
+
+            voice_client: discord.VoiceClient = discord.utils.get(self.bot.voice_clients, guild=guild)
+            audio_source = discord.FFmpegPCMAudio(file)
+            if not voice_client.is_playing():
+                voice_client.play(audio_source, after=None)
+            while voice_client.is_playing():
+                time.sleep(1)
+
+            try:
+                return await ctx.voice_client.disconnect()
+            except:
+                return
+
         except Exception as e:
             return await ctx.send(e)
+
     # fim
 
     @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.channel)
     @commands.guild_only()
-    @commands.command(name='falarko', aliases=['faleko', 'fko', 'ko'])
+    @commands.command(name='coreano', aliases=['koreano', 'ko', 'co'])
     async def ttsko(self, ctx, *, palavra=None, channel: discord.VoiceChannel = None):
-        """
-        Entra na mesma sala de VOZ, e fala o que você escreveu.
-        Koreano
-        """
+        guild = ctx.guild
         if palavra is None:
-            return await ctx.send(".jp + alguma coisa")
-        if discord.utils.find(lambda r: r.name == "ADM Black Holita" or r.name == "TTS [BOT]", ctx.author.roles):
-            # await ctx.message.delete()
-            await ctx.send(f"Lendo a msg")
-        else:
-            return
+            return await ctx.send("gko + text")
+        await ctx.send(f"메시지를 읽는 중, 잠시만")
 
-        # define variables
-
-        file = "file.mp3"
+        random_file_id = random.randint(1, 1000)
+        file = f"file-{random_file_id}.mp3"
 
         # initialize tts, create mp3 and play
         try:
+            # tts = gTTS(text=f'{nome} disse, {palavra}', lang='pt')
             tts = gTTS(text=f'{palavra}', lang='ko')
             tts.save(file)
 
@@ -390,10 +313,93 @@ class Comandos(commands.Cog):
                 except asyncio.TimeoutError:
                     pass
             # tocar som
-            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(file))
-            return ctx.voice_client.play(source)
+
+            voice_client: discord.VoiceClient = discord.utils.get(self.bot.voice_clients, guild=guild)
+            audio_source = discord.FFmpegPCMAudio(file)
+            if not voice_client.is_playing():
+                voice_client.play(audio_source, after=None)
+            while voice_client.is_playing():
+                time.sleep(1)
+
+            try:
+                return await ctx.voice_client.disconnect()
+            except:
+                return
+
         except Exception as e:
             return await ctx.send(e)
+    # fim
+
+    @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.channel)
+    @commands.guild_only()
+    @commands.command(name='german', aliases=['ge', 'al', 'de', 'Deutschland'])
+    async def ttsde(self, ctx, *, palavra=None, channel: discord.VoiceChannel = None):
+        guild = ctx.guild
+        if palavra is None:
+            return await ctx.send("gde + text")
+        await ctx.send(f"Warten Sie mal.")
+
+        random_file_id = random.randint(1, 1000)
+        file = f"file-{random_file_id}.mp3"
+
+        # initialize tts, create mp3 and play
+        try:
+            tts = gTTS(text=f'{palavra}', lang='de')
+            tts.save(file)
+
+        except Exception as e:
+            return await ctx.send(e)
+
+        try:
+            if not channel:
+                try:
+                    channel = ctx.author.voice.channel
+                except AttributeError:
+                    pass
+            vc = ctx.voice_client
+            if vc:
+                if vc.channel.id == channel.id:
+                    return
+                try:
+                    await vc.move_to(channel)
+                except asyncio.TimeoutError:
+                    pass
+            else:
+                try:
+                    await channel.connect()
+                except asyncio.TimeoutError:
+                    pass
+            # tocar som
+
+            voice_client: discord.VoiceClient = discord.utils.get(self.bot.voice_clients, guild=guild)
+            audio_source = discord.FFmpegPCMAudio(file)
+            if not voice_client.is_playing():
+                voice_client.play(audio_source, after=None)
+            while voice_client.is_playing():
+                time.sleep(1)
+
+            try:
+                return await ctx.voice_client.disconnect()
+            except:
+                return
+
+        except Exception as e:
+            return await ctx.send(e)
+    # fim
+
+    @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.channel)
+    @commands.guild_only()
+    @commands.command(name='rec', aliases=['record'])
+    async def gravar(self, ctx):
+        file = "record.mp3"
+
+        texto = """
+Texto aqui.
+        """
+
+        tts = gTTS(text=f'{texto}', lang='pt')
+        tts.save(file)
+        print("Pronto")
     # fim
 
 
