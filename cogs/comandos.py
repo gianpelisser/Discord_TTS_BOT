@@ -4,8 +4,8 @@ from discord.ext import commands
 import asyncio
 import time
 import random
+import os
 from gtts import gTTS
-# pip install gTTS
 """
 from pygame import mixer
 import os
@@ -40,7 +40,7 @@ class Comandos(commands.Cog):
         await ctx.send(f"Lendo sua mensagem, aguarde.")
 
         random_file_id = random.randint(1, 1000)
-        file = f"file-{random_file_id}.mp3"
+        file = f"files/file-{random_file_id}.mp3"
 
         try:
             tts = gTTS(text=f'{palavra}', lang='pt')
@@ -54,7 +54,8 @@ class Comandos(commands.Cog):
                 try:
                     channel = ctx.author.voice.channel
                 except AttributeError:
-                    pass
+                    return await ctx.send(f"{ctx.author.mention} Você precisa estar em um canal de voz.\n"
+                                          f"You need to be on a voice channel.")
             vc = ctx.voice_client
             if vc:
                 if vc.channel.id == channel.id:
@@ -81,9 +82,12 @@ class Comandos(commands.Cog):
                 return await ctx.voice_client.disconnect()
             except:
                 return
+            finally:
+                os.remove(file)
 
         except Exception as e:
             return await ctx.send(e)
+
     # fim
 
     @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.channel)
@@ -110,7 +114,7 @@ class Comandos(commands.Cog):
         await ctx.send(f"Reading your message, wait...")
 
         random_file_id = random.randint(1, 1000)
-        file = f"file-{random_file_id}.mp3"
+        file = f"files/file-{random_file_id}.mp3"
 
         try:
             tts = gTTS(text=f'{palavra}', lang='en')
@@ -124,7 +128,7 @@ class Comandos(commands.Cog):
                 try:
                     channel = ctx.author.voice.channel
                 except AttributeError:
-                    pass
+                    return await ctx.send(f"{ctx.author.mention} You need to be on a voice channel.")
             vc = ctx.voice_client
             if vc:
                 if vc.channel.id == channel.id:
@@ -151,6 +155,8 @@ class Comandos(commands.Cog):
                 return await ctx.voice_client.disconnect()
             except:
                 return
+            finally:
+                os.remove(file)
 
         except Exception as e:
             return await ctx.send(e)
@@ -166,7 +172,7 @@ class Comandos(commands.Cog):
         await ctx.send(f"Leyendo tu mensaje, espera...")
 
         random_file_id = random.randint(1, 1000)
-        file = f"file-{random_file_id}.mp3"
+        file = f"files/file-{random_file_id}.mp3"
 
         # initialize tts, create mp3 and play
         try:
@@ -181,7 +187,8 @@ class Comandos(commands.Cog):
                 try:
                     channel = ctx.author.voice.channel
                 except AttributeError:
-                    pass
+                    return await ctx.send(f"{ctx.author.mention} Tienes que estar en un canal de voz.\n"
+                                          f"You need to be on a voice channel.")
             vc = ctx.voice_client
             if vc:
                 if vc.channel.id == channel.id:
@@ -208,10 +215,11 @@ class Comandos(commands.Cog):
                 return await ctx.voice_client.disconnect()
             except:
                 return
+            finally:
+                os.remove(file)
 
         except Exception as e:
             return await ctx.send(e)
-
     # fim
 
     @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.channel)
@@ -224,7 +232,7 @@ class Comandos(commands.Cog):
         await ctx.send(f"待ってください。")
 
         random_file_id = random.randint(1, 1000)
-        file = f"file-{random_file_id}.mp3"
+        file = f"files/file-{random_file_id}.mp3"
 
         # initialize tts, create mp3 and play
         try:
@@ -239,7 +247,8 @@ class Comandos(commands.Cog):
                 try:
                     channel = ctx.author.voice.channel
                 except AttributeError:
-                    pass
+                    return await ctx.send(f"{ctx.author.mention} You need to be on a voice channel.\n"
+                                          f"音声チャネルを使用する必要があります。")
             vc = ctx.voice_client
             if vc:
                 if vc.channel.id == channel.id:
@@ -266,10 +275,11 @@ class Comandos(commands.Cog):
                 return await ctx.voice_client.disconnect()
             except:
                 return
+            finally:
+                os.remove(file)
 
         except Exception as e:
             return await ctx.send(e)
-
     # fim
 
     @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.channel)
@@ -282,7 +292,7 @@ class Comandos(commands.Cog):
         await ctx.send(f"메시지를 읽는 중, 잠시만")
 
         random_file_id = random.randint(1, 1000)
-        file = f"file-{random_file_id}.mp3"
+        file = f"files/file-{random_file_id}.mp3"
 
         # initialize tts, create mp3 and play
         try:
@@ -298,7 +308,8 @@ class Comandos(commands.Cog):
                 try:
                     channel = ctx.author.voice.channel
                 except AttributeError:
-                    pass
+                    return await ctx.send(f"{ctx.author.mention} You need to be on a voice channel.\n"
+                                          f"음성 채널에 있어야 합니다.")
             vc = ctx.voice_client
             if vc:
                 if vc.channel.id == channel.id:
@@ -325,6 +336,8 @@ class Comandos(commands.Cog):
                 return await ctx.voice_client.disconnect()
             except:
                 return
+            finally:
+                os.remove(file)
 
         except Exception as e:
             return await ctx.send(e)
@@ -340,7 +353,7 @@ class Comandos(commands.Cog):
         await ctx.send(f"Warten Sie mal.")
 
         random_file_id = random.randint(1, 1000)
-        file = f"file-{random_file_id}.mp3"
+        file = f"files/file-{random_file_id}.mp3"
 
         # initialize tts, create mp3 and play
         try:
@@ -355,7 +368,8 @@ class Comandos(commands.Cog):
                 try:
                     channel = ctx.author.voice.channel
                 except AttributeError:
-                    pass
+                    return await ctx.send(f"{ctx.author.mention} You need to be on a voice channel.\n"
+                                          f"Sie müssen sich in einem Sprachkanal befinden.")
             vc = ctx.voice_client
             if vc:
                 if vc.channel.id == channel.id:
@@ -382,6 +396,8 @@ class Comandos(commands.Cog):
                 return await ctx.voice_client.disconnect()
             except:
                 return
+            finally:
+                os.remove(file)
 
         except Exception as e:
             return await ctx.send(e)
@@ -391,15 +407,25 @@ class Comandos(commands.Cog):
     @commands.guild_only()
     @commands.command(name='rec', aliases=['record'])
     async def gravar(self, ctx):
+        await ctx.send(f"{ctx.author.mention} Iniciando Gravação.")
         file = "record.mp3"
 
         texto = """
-Texto aqui.
+Olá, bem-vindo!
+Deixa o like e inscreva-se no canal.
+Neste vídeo, vamos consertar esse trânsito infernal que você está vendo no vídeo.
+
+E como não sou muito "falador", para ajudar o áudio da gravação deu problema, e é por isso que só temos uma música de fundo e esse áudio do google tradutor.
+
+Bem, o começo do vídeo é só a correção do trânsito e somente depois coloquei o video em alta velocidade para que você possa aproveitar o rápido crescimento da cidade.
+
+Me diga o que você está pensando desta cidade, eu acho que está ficando muito bonita, e acredito que ficará muito mais, deixa seu comentário.
         """
 
         tts = gTTS(text=f'{texto}', lang='pt')
         tts.save(file)
         print("Pronto")
+        await ctx.send(f"{ctx.author.mention} Pronto")
     # fim
 
 
