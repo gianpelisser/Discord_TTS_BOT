@@ -1,6 +1,12 @@
+import discord
 from discord.ext import commands
-from discord.ext.commands import bot
-from discord.ext.commands import AutoShardedBot
+from discord.ext.commands import AutoShardedBot, bot
+import discord.role
+import asyncio
+import time
+import random
+import os
+from gtts import gTTS
 # pip install gTTS
 # pip install -U discord.py[voice]
 # pip install -r requirements.txt
@@ -18,9 +24,10 @@ def read_token():
 
 token = read_token()
 
-modulos = ["cogs.comandos"]
 
-bot = AutoShardedBot(command_prefix="tts", case_insensitive=True)
+intents = discord.Intents.default()
+intents.message_content = True
+bot = AutoShardedBot(command_prefix=".", case_insensitive=True, intents=intents)
 # bot.remove_command('help')
 
 
@@ -43,8 +50,6 @@ async def on_ready():
     print('-=-' * 10, '[ Vortex ]', '-=-' * 10)
     print('-=-= [ TTS ] =-=-')
 
-    # await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Game(name=f"Meme Song"))
-
 
 @bot.event
 async def on_message(message):
@@ -55,8 +60,66 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
-if __name__ == "__main__":
-    for modulo in modulos:
-        bot.load_extension(modulo)
+@bot.command(name='portugues', aliases=['fale', 'falar', 'f', 'tts', 'pt', 'br', 'brasil', 'brazil'])
+async def tts_pt_br(ctx, *, palavra=None, channel: discord.VoiceChannel = None):
+    guild = ctx.guild
+    if palavra is None:
+        return await ctx.send("gpt + alguma coisa")
+    await ctx.send(f"Lendo sua mensagem, aguarde.")
 
+    random_file_id = random.randint(1, 1000)
+    file = f"files/file-{random_file_id}.mp3"
+
+    try:
+        user_name = ctx.author.name.lower()
+        if user_name == "VORTEX" or user_name == "VORTEX UwU":
+            user_name = "Vortex"
+        tts = gTTS(text=f'{user_name} disse: {palavra}', lang='pt')
+        tts.save(file)
+
+    except Exception as e:
+        return await ctx.send(e)
+
+    try:
+        if not channel:
+            try:
+                channel = ctx.author.voice.channel
+            except AttributeError:
+                return await ctx.send(f"{ctx.author.mention} Você precisa estar em um canal de voz.\n"
+                                      f"You need to be on a voice channel.")
+        vc = ctx.voice_client
+        if vc:
+            if vc.channel.id == channel.id:
+                return
+            try:
+                await vc.move_to(channel)
+            except asyncio.TimeoutError:
+                pass
+        else:
+            try:
+                await channel.connect()
+            except asyncio.TimeoutError:
+                pass
+        # tocar som
+
+        voice_client: discord.VoiceClient = discord.utils.get(bot.voice_clients, guild=guild)
+        audio_source = discord.FFmpegPCMAudio(file)
+        if not voice_client.is_playing():
+            voice_client.play(audio_source, after=None)
+        while voice_client.is_playing():
+            time.sleep(1)
+
+        try:
+            return await ctx.voice_client.disconnect()
+        except:
+            return
+        finally:
+            os.remove(file)
+
+    except Exception as e:
+        return await ctx.send(e)
+# fim pt
+
+
+if __name__ == "__main__":
     bot.run(token)
