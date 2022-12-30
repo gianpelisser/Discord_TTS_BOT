@@ -60,64 +60,84 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
-@bot.command(name='portugues', aliases=['fale', 'falar', 'f', 'tts', 'pt', 'br', 'brasil', 'brazil'])
+@bot.command(name='tts', aliases=['fale', 'falar', 'speack'])
 async def tts_pt_br(ctx, *, palavra=None, channel: discord.VoiceChannel = None):
     guild = ctx.guild
     if palavra is None:
         return await ctx.send("gpt + alguma coisa")
-    await ctx.send(f"Lendo sua mensagem, aguarde.")
+    await ctx.send(f"Languages: en, pt, fr, ie, ca, de, jp, ko")
 
     random_file_id = random.randint(1, 1000)
     file = f"files/file-{random_file_id}.mp3"
 
-    try:
-        user_name = ctx.author.name.lower()
-        if user_name == "VORTEX" or user_name == "VORTEX UwU":
-            user_name = "Vortex"
-        tts = gTTS(text=f'{user_name} disse: {palavra}', lang='pt')
-        tts.save(file)
+    lang_chose = palavra[:5].split(' ', 1)[0]
+    lang_quant = len(lang_chose)
 
-    except Exception as e:
-        return await ctx.send(e)
+    text_to_say = palavra[lang_quant:]
 
-    try:
-        if not channel:
-            try:
-                channel = ctx.author.voice.channel
-            except AttributeError:
-                return await ctx.send(f"{ctx.author.mention} Você precisa estar em um canal de voz.\n"
-                                      f"You need to be on a voice channel.")
-        vc = ctx.voice_client
-        if vc:
-            if vc.channel.id == channel.id:
-                return
-            try:
-                await vc.move_to(channel)
-            except asyncio.TimeoutError:
-                pass
-        else:
-            try:
-                await channel.connect()
-            except asyncio.TimeoutError:
-                pass
-        # tocar som
+    languages = ['en', 'fr', 'zh-CN', 'h-TW', 'pt', 'es',
+                 'com.au', 'co.uk', 'com', 'ca', 'co.in',
+                 'ie', 'co.za', 'com.br', 'br', 'com.mx',
+                 'ja', 'jp', 'ko', 'ge', 'al', 'de']
 
-        voice_client: discord.VoiceClient = discord.utils.get(bot.voice_clients, guild=guild)
-        audio_source = discord.FFmpegPCMAudio(file)
-        if not voice_client.is_playing():
-            voice_client.play(audio_source, after=None)
-        while voice_client.is_playing():
-            time.sleep(1)
+    if lang_chose in languages:
+        if lang_chose == "br":
+            lang_chose = "com.br"
+        if lang_chose == 'jp':
+            lang_chose = 'ja'
+        if lang_chose == 'ge':
+            lang_chose = 'de'
+        if lang_chose == 'al':
+            lang_chose = 'de'
 
         try:
-            return await ctx.voice_client.disconnect()
-        except:
-            return
-        finally:
-            os.remove(file)
+            user_name = ctx.author.name.lower()
+            if user_name == "VORTEX" or user_name == "VORTEX UwU":
+                user_name = "Vortex"
+            tts = gTTS(text=f'{user_name} disse: {text_to_say}', lang=f'{lang_chose}')
+            tts.save(file)
 
-    except Exception as e:
-        return await ctx.send(e)
+        except Exception as e:
+            return await ctx.send(e)
+
+        try:
+            if not channel:
+                try:
+                    channel = ctx.author.voice.channel
+                except AttributeError:
+                    return await ctx.send(f"{ctx.author.mention} Você precisa estar em um canal de voz.\n"
+                                          f"You need to be on a voice channel.")
+            vc = ctx.voice_client
+            if vc:
+                if vc.channel.id == channel.id:
+                    return
+                try:
+                    await vc.move_to(channel)
+                except asyncio.TimeoutError:
+                    pass
+            else:
+                try:
+                    await channel.connect()
+                except asyncio.TimeoutError:
+                    pass
+            # tocar som
+
+            voice_client: discord.VoiceClient = discord.utils.get(bot.voice_clients, guild=guild)
+            audio_source = discord.FFmpegPCMAudio(file)
+            if not voice_client.is_playing():
+                voice_client.play(audio_source, after=None)
+            while voice_client.is_playing():
+                time.sleep(1)
+
+            try:
+                return await ctx.voice_client.disconnect()
+            except:
+                return
+            finally:
+                os.remove(file)
+
+        except Exception as e:
+            return await ctx.send(e)
 # fim pt
 
 
